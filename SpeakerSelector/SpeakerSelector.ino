@@ -9,10 +9,11 @@
 #define LCD_WR A1
 #define LCD_RD A0
 #define LCD_RESET A4
-//#define SCREEN_MINX 150
-//#define SCREEN_MINY 120
-//#define SCREEN_MAXX 920
-//#define SCREEN_MAXY 1016
+// Values obtained from the calibration
+#define SCREEN_MINX 121
+#define SCREEN_MINY 107
+#define SCREEN_MAXX 968
+#define SCREEN_MAXY 913
 #define BLACK       0x0000
 #define BLUE        0x001F
 #define RED         0xF800
