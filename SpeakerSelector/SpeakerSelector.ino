@@ -96,10 +96,19 @@ void setup(void) {
   height = tft.height() - 1;
 
   buttonsInit();
- // for (uint8_t i=0; i<7;i++){
- //   buttons[i].drawButton();
- //   delay(1000);
- // }
+
+  tft.setCursor (10, 33);
+  tft.setTextSize (2);
+  tft.setTextColor(RED);
+  tft.println("Zone 1");
+  tft.setCursor (10, 113);
+  tft.setTextSize (2);
+  tft.setTextColor(RED);
+  tft.println("Zone 2");
+  tft.setCursor (10, 193);
+  tft.setTextSize (2);
+  tft.setTextColor(RED);
+  tft.println("Zone 3");
 
 }
 void loop(void) {
@@ -109,17 +118,17 @@ void loop(void) {
 
 void buttonsInit() {
 
-  uint16_t x = 120;
-  uint16_t y = 40; // to change
+  uint16_t x = 125;
+  uint16_t y = 40; 
   uint16_t w = 70;
   uint16_t h = 50;
   
-  uint8_t spacing_x = 10;
+  uint8_t spacing_x = 6;
   uint8_t spacing_y = 30;
 
   uint8_t textSize = 2;
 
-  char buttonlabels[7][20] = {"UP", "DOWN", "UP", "DOWN", "UPin", "UPout", "DOWN"};
+  char buttonlabels[7][20] = {"Up", "Down", "Up", "Down", "UpIn", "UpOut", "Down"};
   uint16_t buttoncolors[15] = {DARKCYAN, LIGHTGREY, DARKCYAN, LIGHTGREY, DARKCYAN, DARKCYAN, LIGHTGREY};
   
 
