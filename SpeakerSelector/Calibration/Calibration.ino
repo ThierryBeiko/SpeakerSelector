@@ -1,4 +1,5 @@
 ///////////////
+// *** Modified code from the following source to fit my needs ***
 // Sketch: Calibrate - Calibrate TFT SPFD5408 Touch
 // Author: Joao Lopes F. - joaolopesf@gmail.com
 //
