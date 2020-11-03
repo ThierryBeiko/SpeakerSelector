@@ -36,10 +36,10 @@
 #define TS_MAXX 985
 #define TS_MAXY 917
 */
-short TS_MINX=122;
-short TS_MINY=106;
-short TS_MAXX=985;
-short TS_MAXY=917;
+short TS_MINX=121;
+short TS_MINY=107;
+short TS_MAXX=968;
+short TS_MAXY=913;
 
 // Init TouchScreen:
 
@@ -120,18 +120,18 @@ void setup(void) {
   
   // Initial screen
   
-  tft.setCursor (75, 50);
+  tft.setCursor (90, 50);
   tft.setTextSize (3);
   tft.setTextColor(RED);
   tft.println("SPFD5408");
-  tft.setCursor (65, 85);
+  tft.setCursor (100, 85);
   tft.println("Library");
-  tft.setCursor (55, 150);
+  tft.setCursor (95, 130);
   tft.setTextSize (2);
   tft.setTextColor(BLACK);
   tft.println("Calibration");
 
-  tft.setCursor (80, 250);
+  tft.setCursor (110, 200);
   tft.setTextSize (1);
   tft.setTextColor(BLACK);
   tft.println("Touch to proceed");
@@ -267,7 +267,7 @@ void calibrate_TS(void) {
   tft.fillScreen(BLACK);
 
   tft.fillCircle(314,234,4,WHITE); //show the 2nd point
-  tft.setCursor(50, 280);
+  tft.setCursor(150, 200);
   tft.println("Please touch the other dot");
   delay (500); // debunce
 
