@@ -90,42 +90,55 @@ void setup(void) {
   tft.begin(0x9341);
   tft.setRotation(1); // Change for desired rotation - 1 for landscape view with LCD reset button on the right
 
+  tft.fillScreen(BLACK);
+
   width = tft.width() - 1;
   height = tft.height() - 1;
 
+  buttonsInit();
+ // for (uint8_t i=0; i<7;i++){
+ //   buttons[i].drawButton();
+ //   delay(1000);
+ // }
+
 }
 void loop(void) {
- for (uint16_t a=0; a<10; a++){
-    tft.drawFastVLine(115+a, 160, 10, BLACK); 
-    tft.drawFastHLine(155+a, 120,10,BLACK);
- }
-  
+ 
 
 } 
 
-void ButtonsInit() {
+void buttonsInit() {
 
-  uint16_t x = 40;
-  uint16_t y = height - 20;
+  uint16_t x = 120;
+  uint16_t y = 40; // to change
   uint16_t w = 70;
   uint16_t h = 50;
   
   uint8_t spacing_x = 10;
-  
+  uint8_t spacing_y = 30;
+
   uint8_t textSize = 2;
 
-  char buttonlabels[3][20] = {"Clear", "Show", "Recalib."};
-  uint16_t buttoncolors[15] = {RED, BLUE, RED};
+  char buttonlabels[7][20] = {"UP", "DOWN", "UP", "DOWN", "UPin", "UPout", "DOWN"};
+  uint16_t buttoncolors[15] = {DARKCYAN, LIGHTGREY, DARKCYAN, LIGHTGREY, DARKCYAN, DARKCYAN, LIGHTGREY};
+  
 
-  for (uint8_t b=0; b<3; b++) {
-    buttons[b].initButton(&tft,                           // TFT object
-                  x+b*(w+spacing_x),  y,                  // x, y,
-                  w, h, WHITE, buttoncolors[b], WHITE,    // w, h, outline, fill, 
-                  buttonlabels[b], textSize);             // text
+  for (uint8_t row=0; row<3; row++) {
+    uint8_t nb_col = 2;
+    if(row==2){
+      nb_col = 3;
+    }
+    for (uint8_t col=0; col<nb_col; col++){
+      buttons[col+row*2].initButton(&tft,                         // TFT object
+                  x+col*(w+spacing_x),                            // x
+                  y+row*(h+spacing_y),                            // y
+                  w, h, WHITE, buttoncolors[col+row*2], WHITE,    // w, h, outline, fill, text
+                  buttonlabels[col+row*2], textSize);             
+      buttons[col+row*2].drawButton();        
+    }
   }
 
   // Save the y position to avoid draws
-  
   buttons_y = y;
   
 }
