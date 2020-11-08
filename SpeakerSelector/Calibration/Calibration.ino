@@ -37,10 +37,10 @@
 #define TS_MAXX 985
 #define TS_MAXY 917
 */
-short TS_MINX=121;
-short TS_MINY=107;
-short TS_MAXX=968;
-short TS_MAXY=913;
+short TS_MINX=120;
+short TS_MINY=150;
+short TS_MAXX=940;
+short TS_MAXY=920;
 
 // Init TouchScreen:
 

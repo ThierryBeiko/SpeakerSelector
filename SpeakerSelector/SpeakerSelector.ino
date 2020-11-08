@@ -38,10 +38,10 @@
 TouchScreen ts = TouchScreen(XP, YP, XM, YM, SENSIBILITY);
 
 // Values obtained from the calibration
-#define SCREEN_MINX 121
-#define SCREEN_MINY 107
-#define SCREEN_MAXX 968
-#define SCREEN_MAXY 913
+#define SCREEN_MINX 120
+#define SCREEN_MINY 150
+#define SCREEN_MAXX 940
+#define SCREEN_MAXY 920
 
 // Assigning human-readable names to some common 16-bit color values
 #define BLACK       0x0000
@@ -49,17 +49,8 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, SENSIBILITY);
 #define RED         0xF800
 #define GREEN       0x07E0
 #define CYAN        0x07FF
-#define MAGENTA     0xF81F
-#define YELLOW      0xFFE0
 #define WHITE       0xFFFF
-#define ORANGE      0xFD20
-#define GREENYELLOW 0xAFE5
-#define NAVY        0x000F
-#define DARKGREEN   0x03E0
 #define DARKCYAN    0x03EF
-#define MAROON      0x7800
-#define PURPLE      0x780F
-#define OLIVE       0x7BE0
 #define LIGHTGREY   0xC618
 #define DARKGREY    0x7BEF
 
@@ -85,6 +76,7 @@ Adafruit_GFX_Button buttons[BUTTONS];
 uint16_t buttons_y = 0;
 
 void setup(void) {
+  Serial.begin(9600);
   // LCD setup
   tft.reset();
   tft.begin(0x9341);
@@ -94,6 +86,8 @@ void setup(void) {
 
   width = tft.width() - 1;
   height = tft.height() - 1;
+  Serial.println(width); 
+  Serial.println(height); 
 
   buttonsInit();
 
@@ -112,8 +106,39 @@ void setup(void) {
 
 }
 void loop(void) {
- 
+  TSPoint p;
 
+  //digitalWrite(13, HIGH);  
+  p = waitOnTouch();
+  //digitalWrite(13, LOW);
+
+  // Mapping the point position with the LCD's max and min obtained from calibration
+  p.x = mapXValue(p);
+  p.y = mapYValue(p);
+  Serial.print("("); Serial.print(p.x); Serial.print(", "); 
+  Serial.print(p.y); Serial.print(", "); 
+  Serial.print(p.z); Serial.println(") ");
+
+  // Iterate through all the buttons to check if they were pressed
+  for (uint8_t b=0; b<7; b++) {
+    if (buttons[b].contains(p.x, p.y)) {
+      Serial.print("Pressing: "); 
+      Serial.println(b);
+      buttons[b].press(true);  // tell the button it is pressed
+    } else {
+      buttons[b].press(false);  // tell the button it is NOT pressed
+    }
+  }
+   for (uint8_t j=0; j<7; j++) {
+    if (buttons[j].justReleased()) {
+      // Serial.print("Released: "); Serial.println(b);
+      buttons[j].drawButton();  // draw normal
+    }
+    
+    if (buttons[j].justPressed()) {
+        buttons[j].drawButton(true);  // draw invert!
+    }
+   }
 } 
 
 void buttonsInit() {
@@ -121,10 +146,10 @@ void buttonsInit() {
   uint16_t x = 125;
   uint16_t y = 40; 
   uint16_t w = 70;
-  uint16_t h = 50;
+  uint16_t h = 40;
   
   uint8_t spacing_x = 6;
-  uint8_t spacing_y = 30;
+  uint8_t spacing_y = 40;
 
   uint8_t textSize = 2;
 
@@ -149,5 +174,40 @@ void buttonsInit() {
 
   // Save the y position to avoid draws
   buttons_y = y;
+}
+
+TSPoint waitOnTouch() {
+
+  TSPoint p;
   
+  do {
+    p= ts.getPoint(); 
+    pinMode(XM, OUTPUT); //Pins configures again for TFT control
+    pinMode(YP, OUTPUT);
+  } while((p.z < MINPRESSURE )|| (p.z > MAXPRESSURE));
+  
+  return p;
+}
+
+uint16_t mapXValue(TSPoint p) {
+
+  uint16_t x = map(p.x, SCREEN_MINX, SCREEN_MAXX, 0, tft.width());
+
+  //Correct offset of touch. Manual calibration
+  //x+=1;
+  
+  return x;
+
+}
+
+// Map the coordinate Y
+
+uint16_t mapYValue(TSPoint p) {
+
+  uint16_t y = map(p.y, SCREEN_MINY, SCREEN_MAXY, 0, tft.height());
+
+  //Correct offset of touch. Manual calibration
+  //y-=2;
+
+  return y;
 }
