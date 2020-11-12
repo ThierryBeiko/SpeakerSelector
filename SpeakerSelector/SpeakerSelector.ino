@@ -34,6 +34,13 @@
 #define YM 8 
 #define XP 9 
 
+// Pins for relay control 
+const int relayPin[16] = {22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52};
+
+// Relay activation type - If LOW output activates the relay, trigger type is LOW
+const int triggerType = LOW
+
+
 // Init TouchScreen
 TouchScreen ts = TouchScreen(XP, YP, XM, YM, SENSIBILITY);
 
@@ -99,6 +106,16 @@ void setup(void) {
   printOnScreen(10,113,2,RED,"Zone 2");
   // Zone 3
   printOnScreen(10,193,2,RED,"Zone 3");
+
+  // Set relay pins as OUTPUT
+  for (uint8_t i = 0; i<16; i++){
+    pinMode(relayPin[i],OUTPUT);
+    if(triggerType == LOW){
+      digitalWrite(relayPin[i], HIGH); // set initial state OFF for low trigger relay
+    }else{
+       digitalWrite(relayPin[i], LOW); // set initial state OFF for high trigger relay     
+    }
+  }
 }
 
 void loop(void) {
@@ -119,7 +136,7 @@ void loop(void) {
         buttons[b].press(false);    // Tell the button it is not pressed anymore
         buttons[b].drawButton();    // Redraw it as unpressed (OFF)
         turnButtonOff(b);           
-        
+
       } else {                      // If the button was not pressed yet (OFF)
       buttons[b].press(true);       // Tell the button it is now pressed
       buttons[b].drawButton(true);  // Redraw it as pressed (ON)
@@ -127,7 +144,7 @@ void loop(void) {
       } 
     }
   }
-
+  delay(150);
 } 
 
 // Initiates the buttons and draws them on the screen
