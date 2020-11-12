@@ -77,13 +77,16 @@ uint16_t buttons_y = 0;
 
 void setup(void) {
   Serial.begin(9600);
+
   // LCD setup
   tft.reset();
   tft.begin(0x9341);
   tft.setRotation(1); // Change for desired rotation - 1 for landscape view with LCD reset button on the right
 
+  // Fill the screen with black
   tft.fillScreen(BLACK);
 
+  // Screen size
   width = tft.width() - 1;
   height = tft.height() - 1;
   Serial.println(width); 
@@ -91,20 +94,15 @@ void setup(void) {
 
   buttonsInit();
 
-  tft.setCursor (10, 33);
-  tft.setTextSize (2);
-  tft.setTextColor(RED);
-  tft.println("Zone 1");
-  tft.setCursor (10, 113);
-  tft.setTextSize (2);
-  tft.setTextColor(RED);
-  tft.println("Zone 2");
-  tft.setCursor (10, 193);
-  tft.setTextSize (2);
-  tft.setTextColor(RED);
-  tft.println("Zone 3");
-
+  // Setting up text UI for different zones
+  // Zone 1
+  printOnScreen(10,33,2,RED,"Zone 1");
+  // Zone 2
+  printOnScreen(10,113,2,RED,"Zone 2");
+  // Zone 3
+  printOnScreen(10,193,2,RED,"Zone 3");
 }
+
 void loop(void) {
   TSPoint p;
 
@@ -115,34 +113,66 @@ void loop(void) {
   // Mapping the point position with the LCD's max and min obtained from calibration
   p.x = mapXValue(p);
   p.y = mapYValue(p);
-  Serial.print("("); Serial.print(p.x); Serial.print(", "); 
-  Serial.print(p.y); Serial.print(", "); 
-  Serial.print(p.z); Serial.println(") ");
 
   // Iterate through all the buttons to check if they were pressed
   for (uint8_t b=0; b<7; b++) {
     if (buttons[b].contains(p.x, p.y)) {
-      Serial.print("Pressing: "); 
-      Serial.println(b);
-      buttons[b].press(true);  // tell the button it is pressed
-    } else {
-      buttons[b].press(false);  // tell the button it is NOT pressed
+  //   Serial.print("Pressing: "); 
+  //   Serial.println(b);
+      if (buttons[b].isPressed()){
+        buttons[b].press(false);
+        switch (b) {
+        case BUTTON_ZONE_1_UP:
+          Serial.println("Stop zone 1 up");
+          break;
+
+        case BUTTON_ZONE_1_DOWN:
+          Serial.println("Stop zone 1 down");
+          break;
+
+        case BUTTON_ZONE_2_UP:
+          Serial.println("Stop zone 2 up");
+          break;
+
+        case BUTTON_ZONE_2_DOWN:
+          Serial.println("Stop zone 2 down");
+          break;    
+
+        case BUTTON_ZONE_3_UP_IN:
+          Serial.println("Stop zone 3 up in");
+          break;
+
+        case BUTTON_ZONE_3_UP_OUT:
+          Serial.println("Stop zone 3 up out");
+          break;
+
+        case BUTTON_ZONE_3_DOWN:
+          Serial.println("Stop zone 3 down");
+          break;
+        }
+      } else {
+      buttons[b].press(true);  // tell the button it is NOT pressed
+      } 
     }
   }
-   for (uint8_t j=0; j<7; j++) {
+  for (uint8_t j=0; j<7; j++) {
     if (buttons[j].justReleased()) {
-      // Serial.print("Released: "); Serial.println(b);
+      Serial.print("Released: "); Serial.println(j);
+      Serial.println(buttons[j].justReleased());
       buttons[j].drawButton();  // draw normal
     }
     
     if (buttons[j].justPressed()) {
-        buttons[j].drawButton(true);  // draw invert!
+      Serial.print("Pressed: "); Serial.println(j);
+      buttons[j].drawButton(true);  // draw invert!
+      delay(100);
     }
-   }
+  }
+
 } 
 
+// Initiates the buttons and draws them on the screen
 void buttonsInit() {
-
   uint16_t x = 125;
   uint16_t y = 40; 
   uint16_t w = 70;
@@ -176,8 +206,8 @@ void buttonsInit() {
   buttons_y = y;
 }
 
+// Waits for a touch on the screen and returns the touched point
 TSPoint waitOnTouch() {
-
   TSPoint p;
   
   do {
@@ -189,25 +219,24 @@ TSPoint waitOnTouch() {
   return p;
 }
 
+// Map the coordinate X
 uint16_t mapXValue(TSPoint p) {
-
   uint16_t x = map(p.x, SCREEN_MINX, SCREEN_MAXX, 0, tft.width());
-
-  //Correct offset of touch. Manual calibration
-  //x+=1;
   
   return x;
-
 }
 
 // Map the coordinate Y
-
 uint16_t mapYValue(TSPoint p) {
-
   uint16_t y = map(p.y, SCREEN_MINY, SCREEN_MAXY, 0, tft.height());
 
-  //Correct offset of touch. Manual calibration
-  //y-=2;
-
   return y;
+}
+
+// Prints the desired text to the TFT screen
+void printOnScreen(int xCursor, int yCursor, int textSize, uint16_t color, String text){
+  tft.setCursor (xCursor, yCursor);
+  tft.setTextSize (textSize);
+  tft.setTextColor(color);
+  tft.println(text);
 }
