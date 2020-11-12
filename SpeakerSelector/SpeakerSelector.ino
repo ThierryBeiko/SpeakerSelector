@@ -121,6 +121,7 @@ void loop(void) {
   //   Serial.println(b);
       if (buttons[b].isPressed()){
         buttons[b].press(false);
+        buttons[b].drawButton();
         switch (b) {
         case BUTTON_ZONE_1_UP:
           Serial.println("Stop zone 1 up");
@@ -151,21 +152,9 @@ void loop(void) {
           break;
         }
       } else {
-      buttons[b].press(true);  // tell the button it is NOT pressed
+      buttons[b].press(true);  // tell the button it is pressed
+      buttons[b].drawButton(true);
       } 
-    }
-  }
-  for (uint8_t j=0; j<7; j++) {
-    if (buttons[j].justReleased()) {
-      Serial.print("Released: "); Serial.println(j);
-      Serial.println(buttons[j].justReleased());
-      buttons[j].drawButton();  // draw normal
-    }
-    
-    if (buttons[j].justPressed()) {
-      Serial.print("Pressed: "); Serial.println(j);
-      buttons[j].drawButton(true);  // draw invert!
-      delay(100);
     }
   }
 
@@ -184,7 +173,7 @@ void buttonsInit() {
   uint8_t textSize = 2;
 
   char buttonlabels[7][20] = {"Up", "Down", "Up", "Down", "UpIn", "UpOut", "Down"};
-  uint16_t buttoncolors[15] = {DARKCYAN, LIGHTGREY, DARKCYAN, LIGHTGREY, DARKCYAN, DARKCYAN, LIGHTGREY};
+  uint16_t buttoncolors[15] = {DARKCYAN, DARKGREY, DARKCYAN, DARKGREY, DARKCYAN, DARKCYAN, DARKGREY};
   
 
   for (uint8_t row=0; row<3; row++) {
