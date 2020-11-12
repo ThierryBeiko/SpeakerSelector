@@ -38,8 +38,7 @@
 const int relayPin[16] = {22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52};
 
 // Relay activation type - If LOW output activates the relay, trigger type is LOW
-const int triggerType = LOW
-
+const int triggerType = LOW;
 
 // Init TouchScreen
 TouchScreen ts = TouchScreen(XP, YP, XM, YM, SENSIBILITY);
@@ -78,6 +77,15 @@ uint16_t height = 0;
 #define BUTTON_ZONE_3_UP_OUT 5
 #define BUTTON_ZONE_3_DOWN 6
 
+// Relays associated with each zone
+const int SPEAKER_1_UP[3] = {0,1,2};
+const int SPEAKER_1_DOWN[3] = {3,4,5};
+const int SPEAKER_2_UP[3] = {6,7,8};
+const int SPEAKER_2_DOWN[2] = {9,10};
+const int SPEAKER_3_UP_IN[2] = {11,12};
+const int SPEAKER_3_UP_OUT[2] = {13,14};
+const int SPEAKER_3_DOWN[1] = {15};
+
 Adafruit_GFX_Button buttons[BUTTONS];
 
 uint16_t buttons_y = 0;
@@ -107,7 +115,7 @@ void setup(void) {
   // Zone 3
   printOnScreen(10,193,2,RED,"Zone 3");
 
-  // Set relay pins as OUTPUT
+  // Set relay pins as OUTPUT and to OFF state
   for (uint8_t i = 0; i<16; i++){
     pinMode(relayPin[i],OUTPUT);
     if(triggerType == LOW){
@@ -196,6 +204,7 @@ TSPoint waitOnTouch() {
 }
 
 // Map the coordinate X
+// p : TSPoint to map  
 uint16_t mapXValue(TSPoint p) {
   uint16_t x = map(p.x, SCREEN_MINX, SCREEN_MAXX, 0, tft.width());
   
@@ -203,6 +212,7 @@ uint16_t mapXValue(TSPoint p) {
 }
 
 // Map the coordinate Y
+// p : TSPoint to map 
 uint16_t mapYValue(TSPoint p) {
   uint16_t y = map(p.y, SCREEN_MINY, SCREEN_MAXY, 0, tft.height());
 
@@ -210,6 +220,11 @@ uint16_t mapYValue(TSPoint p) {
 }
 
 // Prints the desired text to the TFT screen
+// xCursor : int corresponding reprensenting the x-coordinate where the text will be printed  
+// yCursor : int corresponding reprensenting the y-coordinate where the text will be printed 
+// textSize : int of the text size
+// color : 16-bit color value code 
+// text : String of the text to prints 
 void printOnScreen(int xCursor, int yCursor, int textSize, uint16_t color, String text){
   tft.setCursor (xCursor, yCursor);
   tft.setTextSize (textSize);
@@ -218,67 +233,94 @@ void printOnScreen(int xCursor, int yCursor, int textSize, uint16_t color, Strin
 }
 
 // Switch case called when a button that was pressed (ON) is now pressed again
+// b : int corresponding to the specified button
 void turnButtonOff(int b){
   switch (b) {
     case BUTTON_ZONE_1_UP:
-      Serial.println("Stop zone 1 up");
+      relayControl(SPEAKER_1_UP,3,0);
       break;
 
     case BUTTON_ZONE_1_DOWN:
-      Serial.println("Stop zone 1 down");
+      relayControl(SPEAKER_1_DOWN,3,0);
       break;
 
     case BUTTON_ZONE_2_UP:
-      Serial.println("Stop zone 2 up");
+      relayControl(SPEAKER_2_UP,3,0);
       break;
     
     case BUTTON_ZONE_2_DOWN:
-      Serial.println("Stop zone 2 down");
+      relayControl(SPEAKER_2_DOWN,2,0);
       break;    
     
     case BUTTON_ZONE_3_UP_IN:
-      Serial.println("Stop zone 3 up in");
+      relayControl(SPEAKER_3_UP_IN,2,0);
       break;
     
     case BUTTON_ZONE_3_UP_OUT:
-      Serial.println("Stop zone 3 up out");
+      relayControl(SPEAKER_3_UP_OUT,2,0);
       break;
 
     case BUTTON_ZONE_3_DOWN:
-      Serial.println("Stop zone 3 down");
+      relayControl(SPEAKER_3_DOWN,1,0);
       break;
   }
 }
 
 // Switch case called when a button that was unpressed (OFF) is pressed 
+// b : int corresponding to the specified button
 void turnButtonOn(int b){
   switch (b) {
     case BUTTON_ZONE_1_UP:
-      Serial.println("Start zone 1 up");
+      relayControl(SPEAKER_1_UP,3,1);
       break;
 
     case BUTTON_ZONE_1_DOWN:
-      Serial.println("Start zone 1 down");
+      relayControl(SPEAKER_1_DOWN,3,1);
       break;
 
     case BUTTON_ZONE_2_UP:
-      Serial.println("Start zone 2 up");
+      relayControl(SPEAKER_2_UP,3,1);
       break;
     
     case BUTTON_ZONE_2_DOWN:
-      Serial.println("Start zone 2 down");
+      relayControl(SPEAKER_2_DOWN,2,1);
       break;    
     
     case BUTTON_ZONE_3_UP_IN:
-      Serial.println("Start zone 3 up in");
+      relayControl(SPEAKER_3_UP_IN,2,1);
       break;
     
     case BUTTON_ZONE_3_UP_OUT:
-      Serial.println("Start zone 3 up out");
+      relayControl(SPEAKER_3_UP_OUT,2,1);
       break;
 
     case BUTTON_ZONE_3_DOWN:
-      Serial.println("Start zone 3 down");
+      relayControl(SPEAKER_3_DOWN,1,1);
       break;
+  }
+}
+
+// Modifies the state (ON or OFF) of the specified relays
+// relays : int array containing the value channel from 0 to 15 of the relays to control
+// action : int representing the requested action (1 = relay ON, 0 = relay OFF)
+void relayControl(int relays[], int arraySize, int action){
+  int state = LOW;
+  // Setting the correct final state depending on the triggerType and the requested action
+  if (triggerType == LOW){  // ON = LOW and OFF = HIGH
+    if (action == 0){       // OFF requested
+      state = HIGH;
+    }
+  } else {                  // triggerType = HIGH so ON = HIGH and OFF = LOW
+    if (action == 1){       // ON requested
+      state = HIGH;
+    }        
+  }
+
+  // Modifying the state of the listed relays
+  for (int i = 0; i<arraySize; i++){
+    //digitalWrite(relayPin[relays[i]],state);
+    Serial.print("Setting relay :"); Serial.print(relays[i]);
+    Serial.print(" on pin : "); Serial.print(relayPin[relays[i]]);
+    Serial.print(" to "); Serial.println(String(state));
   }
 }
