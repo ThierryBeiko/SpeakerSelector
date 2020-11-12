@@ -89,8 +89,6 @@ void setup(void) {
   // Screen size
   width = tft.width() - 1;
   height = tft.height() - 1;
-  Serial.println(width); 
-  Serial.println(height); 
 
   buttonsInit();
 
@@ -117,43 +115,15 @@ void loop(void) {
   // Iterate through all the buttons to check if they were pressed
   for (uint8_t b=0; b<7; b++) {
     if (buttons[b].contains(p.x, p.y)) {
-  //   Serial.print("Pressing: "); 
-  //   Serial.println(b);
-      if (buttons[b].isPressed()){
-        buttons[b].press(false);
-        buttons[b].drawButton();
-        switch (b) {
-        case BUTTON_ZONE_1_UP:
-          Serial.println("Stop zone 1 up");
-          break;
-
-        case BUTTON_ZONE_1_DOWN:
-          Serial.println("Stop zone 1 down");
-          break;
-
-        case BUTTON_ZONE_2_UP:
-          Serial.println("Stop zone 2 up");
-          break;
-
-        case BUTTON_ZONE_2_DOWN:
-          Serial.println("Stop zone 2 down");
-          break;    
-
-        case BUTTON_ZONE_3_UP_IN:
-          Serial.println("Stop zone 3 up in");
-          break;
-
-        case BUTTON_ZONE_3_UP_OUT:
-          Serial.println("Stop zone 3 up out");
-          break;
-
-        case BUTTON_ZONE_3_DOWN:
-          Serial.println("Stop zone 3 down");
-          break;
-        }
-      } else {
-      buttons[b].press(true);  // tell the button it is pressed
-      buttons[b].drawButton(true);
+      if (buttons[b].isPressed()) {  // If button is already pressed (ON)
+        buttons[b].press(false);    // Tell the button it is not pressed anymore
+        buttons[b].drawButton();    // Redraw it as unpressed (OFF)
+        turnButtonOff(b);           
+        
+      } else {                      // If the button was not pressed yet (OFF)
+      buttons[b].press(true);       // Tell the button it is now pressed
+      buttons[b].drawButton(true);  // Redraw it as pressed (ON)
+      turnButtonOn(b);
       } 
     }
   }
@@ -228,4 +198,70 @@ void printOnScreen(int xCursor, int yCursor, int textSize, uint16_t color, Strin
   tft.setTextSize (textSize);
   tft.setTextColor(color);
   tft.println(text);
+}
+
+// Switch case called when a button that was pressed (ON) is now pressed again
+void turnButtonOff(int b){
+  switch (b) {
+    case BUTTON_ZONE_1_UP:
+      Serial.println("Stop zone 1 up");
+      break;
+
+    case BUTTON_ZONE_1_DOWN:
+      Serial.println("Stop zone 1 down");
+      break;
+
+    case BUTTON_ZONE_2_UP:
+      Serial.println("Stop zone 2 up");
+      break;
+    
+    case BUTTON_ZONE_2_DOWN:
+      Serial.println("Stop zone 2 down");
+      break;    
+    
+    case BUTTON_ZONE_3_UP_IN:
+      Serial.println("Stop zone 3 up in");
+      break;
+    
+    case BUTTON_ZONE_3_UP_OUT:
+      Serial.println("Stop zone 3 up out");
+      break;
+
+    case BUTTON_ZONE_3_DOWN:
+      Serial.println("Stop zone 3 down");
+      break;
+  }
+}
+
+// Switch case called when a button that was unpressed (OFF) is pressed 
+void turnButtonOn(int b){
+  switch (b) {
+    case BUTTON_ZONE_1_UP:
+      Serial.println("Start zone 1 up");
+      break;
+
+    case BUTTON_ZONE_1_DOWN:
+      Serial.println("Start zone 1 down");
+      break;
+
+    case BUTTON_ZONE_2_UP:
+      Serial.println("Start zone 2 up");
+      break;
+    
+    case BUTTON_ZONE_2_DOWN:
+      Serial.println("Start zone 2 down");
+      break;    
+    
+    case BUTTON_ZONE_3_UP_IN:
+      Serial.println("Start zone 3 up in");
+      break;
+    
+    case BUTTON_ZONE_3_UP_OUT:
+      Serial.println("Start zone 3 up out");
+      break;
+
+    case BUTTON_ZONE_3_DOWN:
+      Serial.println("Start zone 3 down");
+      break;
+  }
 }
