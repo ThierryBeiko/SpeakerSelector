@@ -271,31 +271,81 @@ void turnButtonOff(int b){
 void turnButtonOn(int b){
   switch (b) {
     case BUTTON_ZONE_1_UP:
+      if (buttons[BUTTON_ZONE_1_DOWN].isPressed()) {
+        buttons[BUTTON_ZONE_1_DOWN].drawButton();
+        buttons[BUTTON_ZONE_1_DOWN].press(false);
+      }
       relayControl(SPEAKER_1_UP,3,1);
+      relayControl(SPEAKER_1_DOWN,3,0);
       break;
 
     case BUTTON_ZONE_1_DOWN:
+      if (buttons[BUTTON_ZONE_1_UP].isPressed()) {
+        buttons[BUTTON_ZONE_1_UP].drawButton();
+        buttons[BUTTON_ZONE_1_UP].press(false);
+      }
       relayControl(SPEAKER_1_DOWN,3,1);
+      relayControl(SPEAKER_1_UP,3,0);
       break;
 
     case BUTTON_ZONE_2_UP:
+      if (buttons[BUTTON_ZONE_2_DOWN].isPressed()) {
+        buttons[BUTTON_ZONE_2_DOWN].drawButton();
+        buttons[BUTTON_ZONE_2_DOWN].press(false);
+      }
       relayControl(SPEAKER_2_UP,3,1);
+      relayControl(SPEAKER_2_DOWN,3,0);
       break;
     
     case BUTTON_ZONE_2_DOWN:
+      if (buttons[BUTTON_ZONE_2_UP].isPressed()) {
+        buttons[BUTTON_ZONE_2_UP].drawButton();
+        buttons[BUTTON_ZONE_2_UP].press(false);
+      }
       relayControl(SPEAKER_2_DOWN,2,1);
+      relayControl(SPEAKER_2_UP,2,0);
       break;    
     
     case BUTTON_ZONE_3_UP_IN:
+      if (buttons[BUTTON_ZONE_3_DOWN].isPressed()) {
+        buttons[BUTTON_ZONE_3_DOWN].drawButton();
+        buttons[BUTTON_ZONE_3_DOWN].press(false);
+      }
+      if (buttons[BUTTON_ZONE_3_UP_OUT].isPressed()) {
+        buttons[BUTTON_ZONE_3_UP_OUT].drawButton();
+        buttons[BUTTON_ZONE_3_UP_OUT].press(false);
+      }
       relayControl(SPEAKER_3_UP_IN,2,1);
+      relayControl(SPEAKER_3_UP_OUT,2,0);
+      relayControl(SPEAKER_3_DOWN,2,0);
       break;
     
     case BUTTON_ZONE_3_UP_OUT:
+    if (buttons[BUTTON_ZONE_3_UP_IN].isPressed()) {
+        buttons[BUTTON_ZONE_3_UP_IN].drawButton();
+        buttons[BUTTON_ZONE_3_UP_IN].press(false);
+      }
+      if (buttons[BUTTON_ZONE_3_DOWN].isPressed()) {
+        buttons[BUTTON_ZONE_3_DOWN].drawButton();
+        buttons[BUTTON_ZONE_3_DOWN].press(false);
+      }
       relayControl(SPEAKER_3_UP_OUT,2,1);
+      relayControl(SPEAKER_3_UP_IN,2,0);
+      relayControl(SPEAKER_3_DOWN,2,0);
       break;
 
     case BUTTON_ZONE_3_DOWN:
+      if (buttons[BUTTON_ZONE_3_UP_IN].isPressed()) {
+        buttons[BUTTON_ZONE_3_UP_IN].drawButton();
+        buttons[BUTTON_ZONE_3_UP_IN].press(false);
+      }
+      if (buttons[BUTTON_ZONE_3_UP_OUT].isPressed()) {
+        buttons[BUTTON_ZONE_3_UP_OUT].drawButton();
+        buttons[BUTTON_ZONE_3_UP_OUT].press(false);
+      }
       relayControl(SPEAKER_3_DOWN,1,1);
+      relayControl(SPEAKER_3_UP_IN,1,0);
+      relayControl(SPEAKER_3_UP_OUT,1,0);
       break;
   }
 }
@@ -319,8 +369,14 @@ void relayControl(int relays[], int arraySize, int action){
   // Modifying the state of the listed relays
   for (int i = 0; i<arraySize; i++){
     //digitalWrite(relayPin[relays[i]],state);
+    String stateStr;
+    if(state == LOW) {
+      stateStr = "ON";
+    }else{
+      stateStr = "OFF";
+      }
     Serial.print("Setting relay :"); Serial.print(relays[i]);
     Serial.print(" on pin : "); Serial.print(relayPin[relays[i]]);
-    Serial.print(" to "); Serial.println(String(state));
+    Serial.print(" to "); Serial.println(stateStr);
   }
 }
