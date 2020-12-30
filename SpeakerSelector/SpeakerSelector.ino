@@ -23,10 +23,14 @@
 #define LCD_RD A0
 #define LCD_RESET A4
 
-// Calibrates value
+// Calibration value
 #define SENSIBILITY 300
 #define MINPRESSURE 10
 #define MAXPRESSURE 1000
+
+// Relay state association 
+#define NC 0
+#define NO 1 
 
 // Pins for the shield (Touchscreen)
 #define YP A2 
@@ -78,13 +82,13 @@ uint16_t height = 0;
 #define BUTTON_ZONE_3_DOWN 6
 
 // Relays associated with each zone
-const int SPEAKER_1_UP[3] = {0,1,2};
-const int SPEAKER_1_DOWN[3] = {3,4,5};
-const int SPEAKER_2_UP[3] = {6,7,8};
-const int SPEAKER_2_DOWN[2] = {9,10};
-const int SPEAKER_3_UP_IN[2] = {11,12};
-const int SPEAKER_3_UP_OUT[2] = {13,14};
-const int SPEAKER_3_DOWN[1] = {15};
+const int SPEAKER_1_UP[4] = {0,1,2,3};
+const int SPEAKER_1_DOWN[4] = {0,1,2,3};
+const int SPEAKER_2_UP[4] = {4,5,6,7};
+const int SPEAKER_2_DOWN[4] = {4,5,6,7};
+const int SPEAKER_3_UP_IN[4] = {12,13,14,15};
+const int SPEAKER_3_UP_OUT[4] = {12,13,14,15};
+const int SPEAKER_3_DOWN[4] = {8,9,10,11};
 
 Adafruit_GFX_Button buttons[BUTTONS];
 
@@ -109,11 +113,11 @@ void setup(void) {
 
   // Setting up text UI for different zones
   // Zone 1
-  printOnScreen(10,33,2,RED,"Zone 1");
+  printOnScreen(10,33,2,WHITE,"1");
   // Zone 2
-  printOnScreen(10,113,2,RED,"Zone 2");
+  printOnScreen(10,113,2,WHITE,"2");
   // Zone 3
-  printOnScreen(10,193,2,RED,"Zone 3");
+  printOnScreen(10,193,2,WHITE,"3");
 
   // Set relay pins as OUTPUT and to OFF state
   for (uint8_t i = 0; i<16; i++){
@@ -157,9 +161,9 @@ void loop(void) {
 
 // Initiates the buttons and draws them on the screen
 void buttonsInit() {
-  uint16_t x = 125;
+  uint16_t x = 80;
   uint16_t y = 40; 
-  uint16_t w = 70;
+  uint16_t w = 100;
   uint16_t h = 40;
   
   uint8_t spacing_x = 6;
@@ -167,8 +171,10 @@ void buttonsInit() {
 
   uint8_t textSize = 2;
 
-  char buttonlabels[7][20] = {"Up", "Down", "Up", "Down", "UpIn", "UpOut", "Down"};
-  uint16_t buttoncolors[15] = {DARKCYAN, DARKGREY, DARKCYAN, DARKGREY, DARKCYAN, DARKCYAN, DARKGREY};
+  char buttonlabels[7][20] = {"Living Rm", "Sauna", "Dining Rm", "B Living", "Library", "Patio", "Gym"};
+  uint16_t buttoncolors[15] = {BLUE, BLUE, BLUE, BLUE, BLUE, BLUE, BLUE};
+  uint16_t buttonwidths[7] = {130,130,130,130,110,80,80};
+  uint16_t button_x[7] = {100,(240+spacing_x),100,(240+spacing_x),90,(185+spacing_x),(185+80+2*spacing_x)};
   
 
   for (uint8_t row=0; row<3; row++) {
@@ -178,9 +184,10 @@ void buttonsInit() {
     }
     for (uint8_t col=0; col<nb_col; col++){
       buttons[col+row*2].initButton(&tft,                         // TFT object
-                  x+col*(w+spacing_x),                            // x
+                  button_x[col+row*2],
+                  //x+col*(w+spacing_x),                            // x
                   y+row*(h+spacing_y),                            // y
-                  w, h, WHITE, buttoncolors[col+row*2], WHITE,    // w, h, outline, fill, text
+                  buttonwidths[col+row*2], h, WHITE, buttoncolors[col+row*2], WHITE,    // w, h, outline, fill, text
                   buttonlabels[col+row*2], textSize);             
       buttons[col+row*2].drawButton();        
     }
@@ -237,31 +244,31 @@ void printOnScreen(int xCursor, int yCursor, int textSize, uint16_t color, Strin
 void turnButtonOff(int b){
   switch (b) {
     case BUTTON_ZONE_1_UP:
-      relayControl(SPEAKER_1_UP,3,0);
+      relayControl(SPEAKER_1_UP,4,NO);
       break;
 
     case BUTTON_ZONE_1_DOWN:
-      relayControl(SPEAKER_1_DOWN,3,0);
+      relayControl(SPEAKER_1_DOWN,4,NC);
       break;
 
     case BUTTON_ZONE_2_UP:
-      relayControl(SPEAKER_2_UP,3,0);
+      relayControl(SPEAKER_2_UP,4,NO);
       break;
     
     case BUTTON_ZONE_2_DOWN:
-      relayControl(SPEAKER_2_DOWN,2,0);
+      relayControl(SPEAKER_2_DOWN,4,NC);
       break;    
     
     case BUTTON_ZONE_3_UP_IN:
-      relayControl(SPEAKER_3_UP_IN,2,0);
+      relayControl(SPEAKER_3_UP_IN,4,NO);
       break;
     
     case BUTTON_ZONE_3_UP_OUT:
-      relayControl(SPEAKER_3_UP_OUT,2,0);
+      relayControl(SPEAKER_3_UP_OUT,4,NC);
       break;
 
     case BUTTON_ZONE_3_DOWN:
-      relayControl(SPEAKER_3_DOWN,1,0);
+      relayControl(SPEAKER_3_DOWN,4,NC);
       break;
   }
 }
@@ -275,8 +282,7 @@ void turnButtonOn(int b){
         buttons[BUTTON_ZONE_1_DOWN].drawButton();
         buttons[BUTTON_ZONE_1_DOWN].press(false);
       }
-      relayControl(SPEAKER_1_UP,3,1);
-      relayControl(SPEAKER_1_DOWN,3,0);
+      relayControl(SPEAKER_1_UP,4,NC);
       break;
 
     case BUTTON_ZONE_1_DOWN:
@@ -284,8 +290,7 @@ void turnButtonOn(int b){
         buttons[BUTTON_ZONE_1_UP].drawButton();
         buttons[BUTTON_ZONE_1_UP].press(false);
       }
-      relayControl(SPEAKER_1_DOWN,3,1);
-      relayControl(SPEAKER_1_UP,3,0);
+      relayControl(SPEAKER_1_DOWN,4,NO);
       break;
 
     case BUTTON_ZONE_2_UP:
@@ -293,8 +298,7 @@ void turnButtonOn(int b){
         buttons[BUTTON_ZONE_2_DOWN].drawButton();
         buttons[BUTTON_ZONE_2_DOWN].press(false);
       }
-      relayControl(SPEAKER_2_UP,3,1);
-      relayControl(SPEAKER_2_DOWN,3,0);
+      relayControl(SPEAKER_2_UP,4,NC);
       break;
     
     case BUTTON_ZONE_2_DOWN:
@@ -302,8 +306,7 @@ void turnButtonOn(int b){
         buttons[BUTTON_ZONE_2_UP].drawButton();
         buttons[BUTTON_ZONE_2_UP].press(false);
       }
-      relayControl(SPEAKER_2_DOWN,2,1);
-      relayControl(SPEAKER_2_UP,2,0);
+      relayControl(SPEAKER_2_DOWN,4,NO);
       break;    
     
     case BUTTON_ZONE_3_UP_IN:
@@ -315,9 +318,8 @@ void turnButtonOn(int b){
         buttons[BUTTON_ZONE_3_UP_OUT].drawButton();
         buttons[BUTTON_ZONE_3_UP_OUT].press(false);
       }
-      relayControl(SPEAKER_3_UP_IN,2,1);
-      relayControl(SPEAKER_3_UP_OUT,2,0);
-      relayControl(SPEAKER_3_DOWN,2,0);
+      relayControl(SPEAKER_3_DOWN,4,NC);
+      relayControl(SPEAKER_3_UP_IN,8,NC);
       break;
     
     case BUTTON_ZONE_3_UP_OUT:
@@ -329,9 +331,8 @@ void turnButtonOn(int b){
         buttons[BUTTON_ZONE_3_DOWN].drawButton();
         buttons[BUTTON_ZONE_3_DOWN].press(false);
       }
-      relayControl(SPEAKER_3_UP_OUT,2,1);
-      relayControl(SPEAKER_3_UP_IN,2,0);
-      relayControl(SPEAKER_3_DOWN,2,0);
+      relayControl(SPEAKER_3_DOWN,4,NC);
+      relayControl(SPEAKER_3_UP_OUT,4,NO);
       break;
 
     case BUTTON_ZONE_3_DOWN:
@@ -343,9 +344,7 @@ void turnButtonOn(int b){
         buttons[BUTTON_ZONE_3_UP_OUT].drawButton();
         buttons[BUTTON_ZONE_3_UP_OUT].press(false);
       }
-      relayControl(SPEAKER_3_DOWN,1,1);
-      relayControl(SPEAKER_3_UP_IN,1,0);
-      relayControl(SPEAKER_3_UP_OUT,1,0);
+      relayControl(SPEAKER_3_DOWN,4,NO);
       break;
   }
 }
@@ -368,7 +367,7 @@ void relayControl(int relays[], int arraySize, int action){
 
   // Modifying the state of the listed relays
   for (int i = 0; i<arraySize; i++){
-    //digitalWrite(relayPin[relays[i]],state);
+    digitalWrite(relayPin[relays[i]],state);
     String stateStr;
     if(state == LOW) {
       stateStr = "ON";
