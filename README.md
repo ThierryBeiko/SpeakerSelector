@@ -13,4 +13,19 @@ To solve this, a microcontroller based relay system was used. This system separa
   - 2.4" TFT LCD display shield (using the SPFD5408 controller because the library used is modified for that specific controller, if another controller is used, there are many other standard librairies that can be used!)
   - 16 relay board (I used this one - https://www.universal-solder.ca/product/16-relay-module-250v-10a-optocoupler-input-5v-power-supply/)
  
+ ## Library used 
+ The library used was : SPFD5408 - from https://github.com/JoaoLopesF/SPFD5408
+ This library includes modified version of the following libraries to make them compatible with the SPFD5408 controller :
+   - Adafruit_GFX
+   - Adafruit_TFTLCD
+   - TouchScreen
  
+ ## The project
+ ### 1) Calibrating the touchscreen
+ To calibrate the touchscreen, a script from the SPFD5408 repository was used and the modified version for this project can be found in this repo. The calibration will return 4 values that are used in the system's program.
+ 
+ ### 2) Mapping the zones and the related speakers
+ The number of zones (each linked to a button) can be modified to fit your own needs. Each button has a label that can also be modified. For this part, UI modification might be needed to ensure that the content fits on the screen. Each of the zones are linked to a number of relays based on the number of speakers associated to each zone. When the relay is set to Normally Closed (NC) a subzone of a zone is alimented and on then when the relay is switched to Normally Open (NO) the other subzone of that zone is now alimented and on, closing at the same time the other subzone. 
+ 
+ 
+ If you wish to recreate this project, feel free to contact me for more details : thierry_beiko@hotmail.com
